@@ -1,0 +1,5 @@
+[files]
+extend-exclude = ["**/*.md"]
+
+[default.extend-words]
+# domain terms (pt-BR fiscal vocabulary kept verbatim, matching the portal's own field names)

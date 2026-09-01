@@ -1,0 +1,52 @@
+name: Check
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          version: "0.12.1"
+          enable-cache: true
+
+      - name: Set up Python
+        run: uv python install
+
+      - name: Sync dependencies
+        run: uv sync --locked --all-groups
+
+      - name: Check formatting
+        run: uv run ruff format --check .
+
+      - name: Lint
+        run: uv run ruff check .
+
+      - name: Type check (basedpyright, gate)
+        run: uv run basedpyright
+
+      - name: Type check (ty, fast, non-blocking)
+        run: uv run ty check || true
+
+      - name: Spell check
+        run: uv run typos
+
+      - name: Dead code
+        run: uv run vulture bin tests --min-confidence 80
+
+      - name: Test
+        run: uv run pytest --cov --cov-report=term-missing
+
+      - name: Audit dependencies
+        run: uv run pip-audit

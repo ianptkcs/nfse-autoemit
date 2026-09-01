@@ -1,0 +1,58 @@
+[project]
+name = "nfse-autoemit"
+version = "0.1.0"
+description = "Browser automation for Brazil's national NFS-e portal, with a human-confirmed review before ever emitting anything."
+requires-python = ">=3.12"
+dependencies = ["playwright", "python-dotenv"]
+
+[dependency-groups]
+dev = [
+    "basedpyright",
+    "ruff",
+    "ty",
+    "typos",
+    "vulture",
+    "pytest",
+    "pytest-cov",
+    "hypothesis",
+    "pip-audit",
+]
+
+[tool.uv]
+package = false
+
+[tool.ruff]
+target-version = "py312"
+line-length = 100
+src = ["bin", "tests"]
+
+[tool.ruff.lint]
+select = [
+    "E",   # pycodestyle errors
+    "F",   # pyflakes
+    "I",   # import sorting
+    "B",   # bugbear
+    "UP",  # pyupgrade
+    "SIM", # simplification
+    "C4",  # comprehensions
+    "PIE", # misc improvements
+    "PTH", # pathlib
+    "RET", # return-value issues
+    "RUF", # Ruff-specific rules
+]
+ignore = ["E501"]
+
+[tool.basedpyright]
+typeCheckingMode = "strict"
+
+[tool.ty]
+include = ["bin", "tests"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["bin"]
+addopts = "-q -m 'not integration'"
+markers = ["integration: exercises the real portal (requires NFSE_LIVE=1)"]
+
+[tool.coverage.run]
+source = ["bin"]
