@@ -376,3 +376,62 @@ Essa é a tela pra `read_review()` extrair o `ReviewSummary` inteiro.
   depois de clicados — não confiar em `fill()` direto, sempre
   clicar-esperar-digitar-esperar-clicar-na-opção (é o que `select_searchable`
   encapsula).
+
+---
+
+## Part 3 — Live run log (2026-09-01, produção real, nota nº 4)
+
+Emissão real feita manualmente via Claude in Chrome (não pelo script — ainda
+em ajuste), seguindo exatamente o mapeamento da Parte 2, pra emitir a nota
+de competência 09/2026 no prazo. Serve como confirmação de que o mapeamento
+está correto contra o site real, com os ajustes/achados abaixo.
+
+### Diffs em relação ao mapeamento original (Parte 2)
+
+- **"Destinatário do Serviço" (pergunta do IBS/CBS) não é obrigatório de
+  verdade**, apesar de não ter asterisco mas parecer parte do fluxo
+  obrigatório: deixei os dois radios ("Sim"/"Não") sem marcar e cliquei
+  "Avançar" mesmo assim — o wizard avançou normalmente pra etapa Serviço.
+  Não precisa clicar em nada nessa seção quando "Preencher as informações
+  IBS/CBS?" já foi "Não" na etapa Pessoas.
+- **Extensão do Claude in Chrome caiu/desconectou 2x** durante a sessão
+  (não é instabilidade só do portal — a ponte browser↔agente também
+  falhou). Sintoma: `tabs_context_mcp` retorna "Browser extension is not
+  connected". Solução: usuário alternar pra janela do Chrome (acorda a
+  extensão) ou reabrir o Chrome; depois `tabs_context_mcp` volta a
+  funcionar. Isso não é um problema do Playwright (que não depende dessa
+  extensão), mas registra que a sessão inteira de login/preenchimento pode
+  precisar ser refeita do zero se a ponte cair no meio.
+- **A sessão expira rápido**: em pelo menos uma ocasião, um simples reload
+  da página `/DPS/Pessoas` (sem nem ter passado muito tempo) já redirecionou
+  pra `/Login?ReturnUrl=...`. Confirma a recomendação da Parte 1 de checar
+  `is_session_expired` depois de toda navegação/reload, não só uma vez no
+  início.
+- **O clique em "Avançar" às vezes não navega instantaneamente** mesmo sem
+  erro visível — a URL só mudou depois de um `wait` + nova checagem. Vale
+  não tratar "URL não mudou logo após o clique" como falha definitiva antes
+  de dar um retry/wait curto.
+- **O PDF (DANFSe) da nota nº 4 tem um layout diferente das notas 1-3**:
+  agora mostra campos "Valor Total Apurado - IBS" / "Valor Total Apurado -
+  CBS" que não existiam antes (provavelmente atualização do template do
+  portal por causa da reforma tributária, mesmo com "Preencher as
+  informações IBS/CBS?" = Não). Não é um erro de preenchimento — é só o
+  portal atualizando o layout do documento entre uma emissão e outra. Vale
+  não assumir que o layout do PDF é estático ao escrever qualquer parsing
+  futuro de DANFSe.
+
+### Resultado final (dados reais, não hardcoded no código)
+
+Nota nº 4 emitida com sucesso: competência 01/09/2026, tomador WHITE WALL
+TECNOLOGIA LTDA, valor R$ 2.000,00, mesmo padrão das 3 notas anteriores. PDF
+e XML baixados, renomeados pro padrão `<N> + 66.544.208 IAN PATRICK DA
+COSTA SOARES.{pdf,xml}` e movidos pra
+`~/Documents/profissionais/wiv/notasfiscais/` (fora deste repo — dado
+pessoal). Conferido depois: os 4 pares PDF/XML têm `nNFSe` sequencial
+(1-4), mesmo tomador, mesmo valor (R$ 2.000,00) e competências mensais em
+sequência (jun→jul→ago→set/2026) — nenhuma inconsistência entre PDF e XML
+de nenhum dos 4.
+
+Essa nota nº 4 é o novo XML de referência mais atual pra validar o `.env`
+e os testes (`tests/test_review.py` etc.) contra dados reais, se precisar
+comparar de novo.
