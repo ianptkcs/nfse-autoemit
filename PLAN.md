@@ -11,7 +11,7 @@ free to delete once the code lands, or keep as an internal design record.
 - Repo público: `github.com/ianptkcs/nfse-autoemit` — já criado e com o
   scaffold inicial commitado/pushado.
 
-### 1. O que o `tscaf` já cobre vs. o que falta desenhar
+### 1. O que o `tascaff` já cobre vs. o que falta desenhar
 
 Já aplicado: `.github/workflows/{ci,release}.yml`, `LICENSE` (AGPL-3.0),
 `CHANGELOG.md`, `CONTRIBUTING.md`/`CONTRIBUTING.pt-BR.md`, templates de
@@ -24,7 +24,7 @@ aplicados), `.gitignore`, `typos.toml`, `uv.lock`.
   `addopts = "-q -m 'not integration'"`,
   `markers = ["integration: exercises the real portal (requires NFSE_LIVE=1)"]`
 
-Falta escrever (não é do tscaf): todo o código em `bin/`, os testes em
+Falta escrever (não é do tascaff): todo o código em `bin/`, os testes em
 `tests/`, `.env.example`, o corpo final dos READMEs.
 
 Depois de codar: `uv run ruff format .` antes de commitar (CI roda
@@ -207,7 +207,7 @@ Tudo no CI é sem browser/rede:
 
 ### 8. README
 
-Corpo (o header/badges o tscaf já cuidou): o problema (MEI preenchendo
+Corpo (o header/badges o tascaff já cuidou): o problema (MEI preenchendo
 NFS-e à mão), a pesquisa (por que não API — certificado A1 pago em todo
 gateway/API oficial; portal web aceita gov.br grátis pra MEI), setup, seção
 de segurança em destaque (dry-run default, dupla confirmação, recusa
